@@ -1,19 +1,19 @@
 #include "LoggerFactory.h"
 
-LoggerFactory::LoggerFactory(void) 
+LoggerFactory::LoggerFactory()
 {
-	_loggers = std::unique_ptr<LoggerDictionary>(new LoggerDictionary);
+	_loggers = std::make_unique<LoggerDictionary>();
 }
-LoggerFactory::~LoggerFactory(void) {}
 
-uintptr_t LoggerFactory::CreateLogger(Configuration &configuration)
+LoggerFactory::~LoggerFactory() = default;
+
+uintptr_t LoggerFactory::CreateLogger(Configuration& configuration)
 {
-	uintptr_t ptr{};
+	uintptr_t ptr = 0;
 
-	std::string *logLevelString = configuration.Value("loglevel");
+	std::string* logLevelString = configuration.Value("loglevel");
 	if (logLevelString == nullptr) return ptr;
-	LogLevel logLevel = LogLevel::Trace;
-
+	LogLevel logLevel;
 	if (*logLevelString == "trace") logLevel = LogLevel::Trace;
 	else if (*logLevelString == "debug") logLevel = LogLevel::Debug;
 	else if (*logLevelString == "info") logLevel = LogLevel::Info;
@@ -22,15 +22,13 @@ uintptr_t LoggerFactory::CreateLogger(Configuration &configuration)
 	else if (*logLevelString == "critical") logLevel = LogLevel::Critical;
 	else return ptr;
 
-	std::string *senderType = configuration.Value("sender");
+	std::string* senderType = configuration.Value("sender");
 	if (senderType == nullptr) return ptr;
 	std::shared_ptr<ISender> sender;
-
 	if (*senderType == "file")
 	{
-		std::string *fileName = configuration.Value("filename");
+		std::string* fileName = configuration.Value("filename");
 		if (fileName == nullptr) return ptr;
-
 		sender = std::shared_ptr<ISender>(new FileSender(fileName->c_str()));
 	}
 	else return ptr;
@@ -40,19 +38,22 @@ uintptr_t LoggerFactory::CreateLogger(Configuration &configuration)
 	_loggers->insert(std::make_pair(ptr, logger));
 	return ptr;
 }
-uintptr_t LoggerFactory::AddLogger(std::shared_ptr<Logger> logger)
+
+uintptr_t LoggerFactory::AddLogger(const std::shared_ptr<Logger>& logger)
 {
 	uintptr_t ptr = reinterpret_cast<uintptr_t>(logger.get());
-	if (_loggers->find(ptr) == _loggers->end()) _loggers->insert(std::make_pair(ptr, logger));	
+	if (_loggers->find(ptr) == _loggers->end()) _loggers->insert(std::make_pair(ptr, logger));
 	return ptr;
 }
-std::shared_ptr<Logger> LoggerFactory::GetLogger(uintptr_t token)
+
+Logger* LoggerFactory::GetLogger(uintptr_t token)
 {
 	if (_loggers->find(token) == _loggers->end()) return nullptr;
-	return _loggers->at(token);
+	return _loggers->at(token).get();
 }
+
 void LoggerFactory::RemoveLogger(uintptr_t token)
 {
-	if (_loggers->find(token) == _loggers->end()) return;
-	_loggers->erase(token);
+	if (_loggers->find(token) != _loggers->end()) _loggers->erase(token);
+
 }

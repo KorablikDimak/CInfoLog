@@ -9,107 +9,75 @@
 class Logger
 {
 public:
-	Logger(std::shared_ptr<ISender> sender, LogLevel logLevel);
-	virtual ~Logger(void);
+	Logger(const std::shared_ptr<ISender>& sender, LogLevel logLevel);
+	~Logger();
 	
 	template<typename T> 
-	void Trace(const T &message)
+	void Trace(const T& message)
 	{
-		try
-		{
-			if (!ValidateLogLevel(LogLevel::Trace)) return;
-			std::stringstream stream;
-			stream << message;
-			std::string stringMessage = stream.str();
-			VM_Trace(stringMessage);
-		}
-		catch (...) {}
+        if (!ValidateLogLevel(LogLevel::Trace)) return;
+        std::stringstream stream;
+        stream << message;
+        std::string stringMessage = stream.str();
+        *_sender << "TRACE " << CreateTimeString().c_str() << " " << message << "\n";
 	}
 
 	template<typename T> 
-	void Debug(const T &message)
+	void Debug(const T& message)
 	{
-		try
-		{
-			if (!ValidateLogLevel(LogLevel::Debug)) return;
-			std::stringstream stream;
-			stream << message;
-			std::string stringMessage = stream.str();
-			VM_Debug(stringMessage);
-		}
-		catch (...) {}
+        if (!ValidateLogLevel(LogLevel::Debug)) return;
+        std::stringstream stream;
+        stream << message;
+        std::string stringMessage = stream.str();
+        *_sender << "DEBUG " << CreateTimeString().c_str() << " " << message << "\n";
 	}
 	
 	template<typename T> 
-	void Info(const T &message)
+	void Info(const T& message)
 	{
-		try
-		{
-			if (!ValidateLogLevel(LogLevel::Info)) return;
-			std::stringstream stream;
-			stream << message;
-			std::string stringMessage = stream.str();
-			VM_Info(stringMessage);
-		}
-		catch (...) {}
+        if (!ValidateLogLevel(LogLevel::Info)) return;
+        std::stringstream stream;
+        stream << message;
+        std::string stringMessage = stream.str();
+        *_sender << "INFO " << CreateTimeString().c_str() << " " << message << "\n";
 	}
 
 	template<typename T> 
-	void Warning(const T &message)
+	void Warning(const T& message)
 	{
-		try
-		{
-			if (!ValidateLogLevel(LogLevel::Warning)) return;
-			std::stringstream stream;
-			stream << message;
-			std::string stringMessage = stream.str();
-			VM_Warning(stringMessage);
-		}
-		catch (...) {}
+        if (!ValidateLogLevel(LogLevel::Warning)) return;
+        std::stringstream stream;
+        stream << message;
+        std::string stringMessage = stream.str();
+        *_sender << "WARNING " << CreateTimeString().c_str() << " " << message << "\n";
 	}
 
 	template<typename T> 
-	void Error(const T &message)
+	void Error(const T& message)
 	{
-		try
-		{
-			if (!ValidateLogLevel(LogLevel::Error)) return;
-			std::stringstream stream;
-			stream << message;
-			std::string stringMessage = stream.str();
-			VM_Error(stringMessage);
-		}
-		catch (...) {}
+        if (!ValidateLogLevel(LogLevel::Error)) return;
+        std::stringstream stream;
+        stream << message;
+        std::string stringMessage = stream.str();
+        *_sender << "ERROR " << CreateTimeString().c_str() << " " << message << "\n";
 	}
 	
 	template<typename T> 
-	void Critical(const T &message)
+	void Critical(const T& message)
 	{
-		try
-		{
-			if (!ValidateLogLevel(LogLevel::Critical)) return;
-			std::stringstream stream;
-			stream << message;
-			std::string stringMessage = stream.str();
-			VM_Critical(stringMessage);
-		}
-		catch (...) {}
+        if (!ValidateLogLevel(LogLevel::Critical)) return;
+        std::stringstream stream;
+        stream << message;
+        std::string stringMessage = stream.str();
+        *_sender << "CRITICAL " << CreateTimeString().c_str() << " " << message << "\n";
 	}
-
-protected:
-	virtual void VM_Trace(std::string &message);
-	virtual void VM_Debug(std::string &message);
-	virtual void VM_Info(std::string &message);
-	virtual void VM_Warning(std::string &message);
-	virtual void VM_Error(std::string &message);
-	virtual void VM_Critical(std::string &message);
-
-	virtual std::string CreateTimeString(void);
-	virtual bool ValidateLogLevel(LogLevel logLevel);
 
 private:
-	std::shared_ptr<ISender> _sender;
-	LogLevel _minLogLevel;
+    std::shared_ptr<ISender> _sender;
+    LogLevel _logLevel;
+
+    std::string CreateTimeString();
+    bool ValidateLogLevel(LogLevel logLevel);
 };
 
 #endif

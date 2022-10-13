@@ -9,12 +9,18 @@
 class FileSender : public ISender
 {
 public:
-	FileSender(std::string &fileName);
-	FileSender(const char fileName[]);
-	virtual ~FileSender(void);
+    template<typename T>
+	explicit FileSender(const T& fileName)
+    {
+        std::stringstream stream;
+        stream << fileName;
+        _fileName = stream.str();
+    }
+
+	~FileSender() override;
 
 protected:
-	virtual void VM_Send(std::string &message);
+	void Send(const std::string& message) override;
 
 private:
 	std::string _fileName;

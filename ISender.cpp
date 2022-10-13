@@ -1,9 +1,10 @@
 #include "ISender.h"
 
-ISender::ISender(void) : std::ostream(this) {}
-ISender::~ISender(void) {}
+ISender::ISender() : std::ostream(this) {}
 
-void ISender::VM_Send(std::string &message)
+ISender::~ISender() = default;
+
+void ISender::Send(const std::string& message)
 {
-	throw std::domain_error("No defenition of virtual method VM_Send in class ISender");
+	throw std::domain_error("No definition of virtual method Send in class ISender");
 }

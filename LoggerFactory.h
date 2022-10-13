@@ -10,12 +10,12 @@ class LoggerFactory
 public:
 	typedef std::map<uintptr_t, std::shared_ptr<Logger>> LoggerDictionary;
 
-	LoggerFactory(void);
-	~LoggerFactory(void);
+	LoggerFactory();
+	~LoggerFactory();
 
-	uintptr_t CreateLogger(Configuration &configuration);
-	uintptr_t AddLogger(std::shared_ptr<Logger> logger);
-	std::shared_ptr<Logger> GetLogger(uintptr_t token);
+	uintptr_t CreateLogger(Configuration& configuration);
+	uintptr_t AddLogger(const std::shared_ptr<Logger>& logger);
+	Logger* GetLogger(uintptr_t token);
 	void RemoveLogger(uintptr_t token);
 
 private:
